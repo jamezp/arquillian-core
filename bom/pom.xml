@@ -275,4 +275,22 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <profiles>
+    <profile>
+      <id>ci-snapshot-release</id>
+      <distributionManagement>
+        <repository>
+          <id>github</id>
+          <name>GitHub Arquillian Core Apache Maven Packages</name>
+          <url>https://maven.pkg.github.com/jamezp/arquillian-core</url>
+        </repository>
+        <snapshotRepository>
+          <id>github</id>
+          <name>GitHub Arquillian Core Apache Maven Packages</name>
+          <url>https://maven.pkg.github.com/jamezp/arquillian-core</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+
 </project>
