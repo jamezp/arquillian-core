@@ -221,7 +221,7 @@ public class ArquillianExtension implements BeforeAllCallback, AfterAllCallback,
                 }
                 return holder.get(parameterContext.getIndex()) != null;
             }
-            // We always return here as we are an in-container test, but technically running on the client side. This
+            // We always return true here as we are an in-container test, but technically running on the client side. This
             // happens as JUnit needs to invoke the test, then Arquillian runs it in the container. This does, however,
             // create issues when you want to inject a parameter not provided by Arquillian. For example @TempDir Path.
             // To make other provided parameters work, the @Vetoed annotation can be used to indicate the Arquillian
