@@ -379,7 +379,7 @@ public class ManagerImpl implements Manager {
     }
 
     /**
-     * @param extensions
+     * @param extensionClasses
      * @return
      */
     private List<Extension> createExtensions(Collection<Class<?>> extensionClasses) throws Exception {
@@ -394,7 +394,7 @@ public class ManagerImpl implements Manager {
     }
 
     /**
-     * @param contexts2
+     * @param contextClasses
      * @return
      */
     private List<Context> createContexts(Collection<Class<? extends Context>> contextClasses) throws Exception {

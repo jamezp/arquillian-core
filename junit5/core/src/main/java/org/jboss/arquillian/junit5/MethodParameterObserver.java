@@ -25,7 +25,13 @@ import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
 import org.jboss.arquillian.core.spi.ServiceLoader;
 import org.jboss.arquillian.test.spi.TestEnricher;
+import org.jboss.arquillian.test.spi.event.enrichment.AfterEnrichment;
+import org.jboss.arquillian.test.spi.event.enrichment.BeforeEnrichment;
 import org.jboss.arquillian.test.spi.event.enrichment.EnrichmentEvent;
+import org.jboss.arquillian.test.spi.event.suite.Before;
+
+import java.lang.reflect.Method;
+import java.util.Collection;
 
 /**
  * The observer used to process method parameters provided by Arquillian.
@@ -39,13 +45,28 @@ public class MethodParameterObserver {
 
     @Inject
     private Event<EnrichmentEvent> enrichmentEvent;
+    @Inject
+    private Instance<MethodParameters> methodParameters;
 
     /**
      * Updates the stored {@link MethodParameters} for method parameters which can be provided by Arquillian.
      *
      * @param event the fired event
      */
-    public void injectParameters(@Observes MethodParameterInjectionEvent event) {
-        event.enrichParameters(serviceLoader.get().all(TestEnricher.class), enrichmentEvent);
+    public void injectParameters(@Observes Before event) {
+        final Object testInstance = event.getTestInstance();
+        final Method testMethod = event.getTestMethod();
+        enrichmentEvent.fire(new BeforeEnrichment(testInstance, testMethod));
+        MethodParameters testParameterHolder = methodParameters.get();
+        Collection<TestEnricher> testEnrichers = serviceLoader.get().all(TestEnricher.class);
+        for (TestEnricher enricher : testEnrichers) {
+            final Object[] values = enricher.resolve(testMethod);
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] != null) {
+                    testParameterHolder.add(i, values[i]);
+                }
+            }
+        }
+        enrichmentEvent.fire(new AfterEnrichment(testEnrichers, testMethod));
     }
 }

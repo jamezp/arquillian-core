@@ -49,5 +49,13 @@ public interface Manager {
 
     void addExtension(Class<?> extension) throws Exception;
 
+    /**
+     * Lookup an extension by type
+     * @param type - the class registered as an extension
+     * @return the extension instance if found, null otherwise
+     * @param <T> the type of the extension
+     */
+    <T> T getExtension(Class<T> type);
+
     void removeExtension(Class<?> extension) throws Exception;
 }

@@ -1,7 +1,5 @@
 package org.jboss.arquillian.junit5;
 
-import org.jboss.arquillian.test.spi.TestRunnerAdaptor;
-import org.jboss.arquillian.test.spi.TestRunnerAdaptorBuilder;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import static org.jboss.arquillian.junit5.ContextStore.getContextStore;
@@ -9,7 +7,7 @@ import static org.jboss.arquillian.junit5.ContextStore.getContextStore;
 public class JUnitJupiterTestClassLifecycleManager implements ExtensionContext.Store.CloseableResource {
     private static final String MANAGER_KEY = "testRunnerManager";
 
-    private TestRunnerAdaptor adaptor;
+    private JunitEventTestRunnerAdaptor adaptor;
 
     private Throwable caughtInitializationException;
 
@@ -35,7 +33,7 @@ public class JUnitJupiterTestClassLifecycleManager implements ExtensionContext.S
     private void initializeAdaptor() throws Exception {
         try {
             // ARQ-1742 If exceptions happen during boot
-            adaptor = TestRunnerAdaptorBuilder.build();
+            adaptor = JunitEventTestRunnerAdaptor.build();
             // don't set it if beforeSuite fails
             adaptor.beforeSuite();
         } catch (Exception e) {
@@ -73,7 +71,7 @@ public class JUnitJupiterTestClassLifecycleManager implements ExtensionContext.S
         throw e;
     }
 
-    TestRunnerAdaptor getAdaptor() {
+    JunitEventTestRunnerAdaptor getAdaptor() {
         return adaptor;
     }
 }

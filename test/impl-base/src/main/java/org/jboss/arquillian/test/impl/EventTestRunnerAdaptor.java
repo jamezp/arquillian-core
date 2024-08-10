@@ -67,6 +67,10 @@ public class EventTestRunnerAdaptor implements TestRunnerAdaptor {
         this.manager = manager;
     }
 
+    protected Manager getManager() {
+        return manager;
+    }
+
     public void beforeSuite() throws Exception {
         manager.fire(new BeforeSuite());
     }

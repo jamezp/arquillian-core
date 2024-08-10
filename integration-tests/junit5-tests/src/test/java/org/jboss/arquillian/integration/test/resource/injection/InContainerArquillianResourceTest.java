@@ -25,7 +25,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.jboss.arquillian.integration.test.common.TestEnvironment;
-import org.jboss.arquillian.junit5.annotations.Vetoed;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -71,7 +70,7 @@ public class InContainerArquillianResourceTest extends AbstractArquillianResourc
     }
 
     @Test
-    public void checkMultipleParameters(@ArquillianResource final URL url, @Vetoed @TempDir final Path tempDir) {
+    public void checkMultipleParameters(@ArquillianResource final URL url, @TempDir final Path tempDir) {
         Assertions.assertNotNull(url, "The URL should have been injected");
         Assertions.assertEquals(TestEnvironment.protocol(), url.getProtocol());
         checkHost(url.getHost());

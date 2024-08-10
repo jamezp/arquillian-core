@@ -5,12 +5,10 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.jboss.arquillian.junit5.annotations.Vetoed;
 import org.jboss.arquillian.junit5.extension.RunModeEvent;
 import org.jboss.arquillian.test.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.test.spi.TestMethodExecutor;
 import org.jboss.arquillian.test.spi.TestResult;
-import org.jboss.arquillian.test.spi.TestRunnerAdaptor;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -52,16 +50,17 @@ public class ArquillianExtension implements BeforeAllCallback, AfterAllCallback,
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         // Get the adapter, test instance and method
-        final TestRunnerAdaptor adapter = getManager(context)
+        final JunitEventTestRunnerAdaptor adapter = getManager(context)
             .getAdaptor();
         final Object instance = context.getRequiredTestInstance();
         final Method method = context.getRequiredTestMethod();
         // Create a new parameter holder
         final MethodParameters holder = ContextStore.getContextStore(context).createMethodParameters();
+        adapter.setMethodParameters(holder);
         adapter.before(
             instance,
             method,
-            () -> adapter.fireCustomLifecycle(new MethodParameterInjectionEvent(instance, method, holder)));
+            LifecycleMethodExecutor.NO_OP);
     }
 
     @Override
@@ -209,24 +208,13 @@ public class ArquillianExtension implements BeforeAllCallback, AfterAllCallback,
 
     @Override
     public boolean supportsParameter(final ParameterContext parameterContext, final ExtensionContext extensionContext) throws ParameterResolutionException {
-        if (parameterContext.isAnnotated(Vetoed.class)) {
-            return false;
-        }
         try {
-            if (isRunAsClient(extensionContext) || IS_INSIDE_ARQUILLIAN.test(extensionContext)) {
-                // Get the parameter holder
-                final MethodParameters holder = ContextStore.getContextStore(extensionContext).getMethodParameters();
-                if (holder == null) {
-                    throw createParameterResolutionException(parameterContext, null);
-                }
-                return holder.get(parameterContext.getIndex()) != null;
+            // Get the parameter holder
+            final MethodParameters holder = ContextStore.getContextStore(extensionContext).getMethodParameters();
+            if (holder == null) {
+                throw createParameterResolutionException(parameterContext, null);
             }
-            // We always return true here as we are an in-container test, but technically running on the client side. This
-            // happens as JUnit needs to invoke the test, then Arquillian runs it in the container. This does, however,
-            // create issues when you want to inject a parameter not provided by Arquillian. For example @TempDir Path.
-            // To make other provided parameters work, the @Vetoed annotation can be used to indicate the Arquillian
-            // should not attempt to provide the annotation.
-            return true;
+            return holder.get(parameterContext.getIndex()) != null;
         } catch (Exception e) {
             throw createParameterResolutionException(parameterContext, e);
         }
@@ -234,10 +222,6 @@ public class ArquillianExtension implements BeforeAllCallback, AfterAllCallback,
 
     @Override
     public Object resolveParameter(final ParameterContext parameterContext, final ExtensionContext extensionContext) throws ParameterResolutionException {
-        // This should never happen, but return null just in case
-        if (parameterContext.isAnnotated(Vetoed.class)) {
-            return null;
-        }
         try {
             // Get the parameter holder
             final MethodParameters holder = ContextStore.getContextStore(extensionContext).getMethodParameters();
