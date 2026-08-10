@@ -46,7 +46,7 @@
     <skipTests>${skipItTests}</skipTests>
 
     <!-- Dependency versions -->
-    <version.jakarta.ee>10.0.0</version.jakarta.ee>
+    <version.jakarta.ee>11.0.0</version.jakarta.ee>
     <version.org.jboss.arquillian.jakarta>10.0.0.Final</version.org.jboss.arquillian.jakarta>
     <version.org.kohsuke.metainf-services>1.11</version.org.kohsuke.metainf-services>
 
